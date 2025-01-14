@@ -3,11 +3,18 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/scipiotech/pokedex/internal/pokeapi"
 	"os"
 	"strings"
 )
 
-func startRepl() {
+type config struct {
+	pokeapiClient        pokeapi.Client
+	nextLocationsURL     *string
+	previousLocationsURL *string
+}
+
+func startRepl(cfg *config) {
 
 	reader := bufio.NewScanner(os.Stdin)
 	for {
@@ -23,7 +30,7 @@ func startRepl() {
 
 		command, exists := getCommands()[commandName]
 		if exists {
-			err := command.callback()
+			err := command.callback(cfg)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -33,19 +40,16 @@ func startRepl() {
 	}
 }
 
-type cliCommand struct {
-	name        string
-	description string
-	callback    func() error
-}
-
-var commands map[string]cliCommand
-
 func cleanInput(text string) []string {
 	lowered := strings.ToLower(text)
 	words := strings.Fields(lowered)
-
 	return words
+}
+
+type cliCommand struct {
+	name        string
+	description string
+	callback    func(*config) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -59,6 +63,16 @@ func getCommands() map[string]cliCommand {
 			name:        "exit",
 			description: "Exit the Pokedex",
 			callback:    commandExit,
+		},
+		"map": {
+			name:        "map",
+			description: "Display the names of 20 location areas",
+			callback:    commandMapf,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Display the previous page of 20 location areas",
+			callback:    commandMapb,
 		},
 	}
 }
