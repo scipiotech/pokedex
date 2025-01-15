@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/scipiotech/pokedex/internal/pokeapi"
+	"github.com/scipiotech/pokedex/internal/pokecache"
 	"os"
 	"strings"
 )
@@ -12,6 +13,7 @@ type config struct {
 	pokeapiClient        pokeapi.Client
 	nextLocationsURL     *string
 	previousLocationsURL *string
+	cache                *pokecache.Cache
 }
 
 func startRepl(cfg *config) {
